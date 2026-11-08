@@ -1,0 +1,1004 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Chi tiết văn bản{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-main {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .detail-header-title {
+    border-left: 4px solid var(--primary);
+    padding-left: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+  }
+
+  .detail-info-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 0.9fr;
+    gap: 24px;
+    margin-top: 20px;
+  }
+
+  .detail-col p {
+    margin: 0 0 10px;
+    font-size: 13px;
+    color: var(--text-main);
+    line-height: 1.5;
+  }
+
+  .detail-col strong {
+    font-weight: 700;
+    color: #334155;
+  }
+
+  .detail-note-box {
+    margin-top: 16px;
+    background: #F1F5F9;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text-main);
+  }
+
+  .status-badge-detail {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .status-badge-detail.badge-cho-xu-ly {
+    background: #FEF9C3;
+    color: #854D0E;
+  }
+
+  .status-badge-detail.badge-da-xu-ly {
+    background: #DBEAFE;
+    color: #1E40AF;
+  }
+
+  .status-badge-detail.badge-cho-ban-hanh {
+    background: #FFF9C4;
+    color: #78670a;
+  }
+
+  .status-badge-detail.badge-da-ban-hanh {
+    background: #DCFCE7;
+    color: #166534;
+  }
+
+  .status-badge-detail.badge-hoan-tra {
+    background: #FEE2E2;
+    color: #991B1B;
+  }
+
+  .file-pill {
+    border: 1px solid var(--border-color);
+    padding: 8px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  }
+
+  .file-pill.active {
+    border-color: var(--primary);
+    background: #EFF6FF;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+  }
+
+  .file-type-pdf,
+  .file-type-docx,
+  .file-type-xlsx,
+  .file-type-default {
+    font-weight: 700;
+    font-size: 11px;
+    min-width: 36px;
+    text-align: center;
+    background: #F1F5F9;
+  }
+
+  .file-type-pdf {
+    background: #F1F5F9;
+    color: #DC2626;
+  }
+
+  .file-type-docx {
+    color: #2563EB;
+  }
+
+  .file-type-xlsx {
+    color: #16A34A;
+  }
+
+  .file-type-default {
+    color: #475569;
+  }
+
+  .preview-shell {
+    background: #D1D5DB;
+    padding: 18px;
+    min-height: 620px;
+    margin-bottom: 24px;
+    border: 1px solid #CBD5E1;
+  }
+
+  .preview-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .preview-toolbar .toolbar-btn {
+    min-width: 32px;
+    height: 32px;
+    border: 1px solid #CBD5E1;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 12px;
+    font-size: 13px;
+    text-decoration: none;
+    color: #111827;
+  }
+
+  .preview-toolbar .toolbar-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .toolbar-btn-download {
+    background: #EFF6FF !important;
+    border-color: #93C5FD !important;
+    color: #1D4ED8 !important;
+  }
+
+  .toolbar-btn-print {
+    background: #F0FDF4 !important;
+    border-color: #86EFAC !important;
+    color: #15803D !important;
+  }
+
+  .preview-page-info {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1E3A8A;
+    min-width: 92px;
+    text-align: center;
+  }
+
+  .preview-open-link {
+    height: 32px;
+    padding: 0 14px;
+    border: 1px solid #CBD5E1;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #111827;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .preview-body {
+    background: #fff;
+    min-height: 520px;
+    max-height: 820px;
+    padding: 0;
+    overflow: auto;
+    border: 1px solid #E5E7EB;
+  }
+
+  .preview-empty,
+  .preview-loading,
+  .preview-error {
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    color: #64748B;
+    font-size: 14px;
+    text-align: center;
+    padding: 24px;
+  }
+
+  .preview-error {
+    color: #B91C1C;
+  }
+
+  .pdf-canvas {
+    background: #fff;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  .docx-stage {
+    padding: 36px 42px;
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.7;
+    color: #111827;
+    font-size: 16px;
+  }
+
+  .docx-stage img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .docx-stage table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+  }
+
+  .docx-stage table,
+  .docx-stage th,
+  .docx-stage td {
+    border: 1px solid #CBD5E1;
+  }
+
+  .docx-stage th,
+  .docx-stage td {
+    padding: 8px 10px;
+  }
+
+  .xlsx-wrap {
+    padding: 20px;
+  }
+
+  .xlsx-sheet-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .xlsx-tab {
+    padding: 8px 12px;
+    border: 1px solid #CBD5E1;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .xlsx-tab.active {
+    background: #DBEAFE;
+    border-color: #60A5FA;
+    color: #1D4ED8;
+  }
+
+  .xlsx-table-wrap {
+    overflow: auto;
+  }
+
+  .xlsx-table-wrap table {
+    border-collapse: collapse;
+    min-width: 100%;
+    font-size: 14px;
+  }
+
+  .xlsx-table-wrap th,
+  .xlsx-table-wrap td {
+    border: 1px solid #CBD5E1;
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+
+  .xlsx-table-wrap th {
+    background: #F8FAFC;
+  }
+
+  .related-files {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .related-file {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    background: #F8FAFC;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  }
+
+  .related-file.active {
+    border-color: var(--primary);
+    background: #EFF6FF;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+  }
+
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+
+    #print-area,
+    #print-area * {
+      visibility: visible;
+    }
+
+    #print-area {
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      z-index: var(--z-modal, 1000);
+      overflow: visible;
+      padding: 0;
+    }
+
+    #print-area img {
+      display: block;
+      width: 100%;
+      page-break-after: always;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .detail-info-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .preview-shell {
+      min-height: 480px;
+      padding: 12px;
+    }
+
+    .preview-body,
+    .preview-empty,
+    .preview-loading,
+    .preview-error {
+      min-height: 380px;
+    }
+
+    .docx-stage {
+      padding: 18px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'core:dashboard' %}">
+  <svg width="14" height="14" viewBox="0 0 24 24">
+    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+  </svg>
+  Trang chủ
+</a>
+<span class="breadcrumb-sep">›</span>
+<a href="{% url 'quanlyvanbandi:van_ban_di' %}">Văn bản đi</a>
+<span class="breadcrumb-sep">›</span>
+<span>Chi tiết văn bản</span>
+{% endblock %}
+
+{% block content %}
+
+  <div class="card"
+    style="padding: 24px 32px; border: 1px solid var(--border-color); box-shadow: none; margin-bottom: 24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div class="detail-header-title">THÔNG TIN VĂN BẢN ĐI</div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        {# ===== LÃNH ĐẠO ===== #}
+        {% if request.user.role == "LANH_DAO" %}
+        {# Chỉ hiện Phê duyệt / Hoàn trả khi văn bản đang Chờ Xử Lý #}
+        {% if vb.trang_thai == "Chờ Xử Lý" %}
+        {% if vb.file_dinh_kem %}
+        <button type="button" class="btn btn-primary" style="padding:8px 16px; background:#4f46e5; border-color:#4f46e5;" data-file-url="{{ vb.file_dinh_kem.url|escapejs }}" onclick="openKySoModal(this.dataset.fileUrl)">Ký số</button>
+        {% endif %}
+        <button type="button" class="btn btn-success" style="padding:8px 16px;" id="openApprovalModal">Phê
+          duyệt</button>
+        <button type="button" class="btn btn-warning" style="padding:8px 16px;" id="openReturnModal">Hoàn trả</button>
+        {% endif %}
+        {# Chỉnh sửa: cho phép Lãnh đạo chỉnh sửa khi Chờ Xử Lý hoặc Hoàn Trả #}
+        {% if vb.trang_thai == "Chờ Xử Lý" or vb.trang_thai == "Hoàn Trả" %}
+        <a href="{% url 'quanlyvanbandi:sua_van_ban_di' vb.pk %}" class="btn btn-primary"
+          style="padding:8px 16px; text-decoration:none; background:#0284C7;">Chỉnh sửa</a>
+        {% endif %}
+        {% if vb.ho_so_van_ban %}
+        <a href="{% url 'hosovanban:chi_tiet' vb.ho_so_van_ban.pk %}" class="btn btn-primary" style="padding:8px 16px; text-decoration:none;">Xem hồ sơ</a>
+        {% else %}
+        <button type="button" class="btn btn-primary" style="padding:8px 16px;" onclick="openThemVanBanPopup()">Thêm hồ sơ</button>
+        {% endif %}
+        {% endif %}
+        
+        {% if task %}
+        <a href="{% url 'quanlycongviec:task_detail' task.pk %}" class="btn btn-info" style="padding:8px 16px; text-decoration:none;">Xem công việc</a>
+        {% else %}
+        <a href="{% url 'quanlycongviec:giao_viec' %}?van_ban_id={{ vb.pk }}&nguon_giao=Văn bản đi&ten_cv={{ vb.trich_yeu|urlencode }}" class="btn btn-info" style="padding:8px 16px; text-decoration:none;">Giao việc</a>
+        {% endif %}
+
+        {# ===== CHUYÊN VIÊN ===== #}
+        {% if request.user.role == "CHUYEN_VIEN" %}
+        {# Chỉnh sửa: chỉ khi Chờ Xử Lý hoặc Hoàn Trả #}
+        {% if vb.trang_thai == "Chờ Xử Lý" or vb.trang_thai == "Hoàn Trả" %}
+        <a href="{% url 'quanlyvanbandi:sua_van_ban_di' vb.pk %}" class="btn btn-primary"
+          style="padding:8px 16px; text-decoration:none; background:#0284C7;">Chỉnh sửa</a>
+        {% endif %}
+        {# Xóa: chỉ khi Chờ Xử Lý (chưa duyệt) #}
+        {% if vb.trang_thai == "Chờ Xử Lý" %}
+        <form method="post" action="{% url 'quanlyvanbandi:xoa_van_ban_di' vb.pk %}" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa văn bản này hay không?\nHành động này không thể hoàn tác.');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" style="padding:8px 16px;">Xóa văn bản</button>
+        </form>
+        {% endif %}
+        {% if vb.ho_so_van_ban %}
+        <a href="{% url 'hosovanban:chi_tiet' vb.ho_so_van_ban.pk %}" class="btn btn-primary" style="padding:8px 16px; text-decoration:none;">Xem hồ sơ</a>
+        {% else %}
+        <button class="btn btn-primary" style="padding:8px 16px;" onclick="openThemVanBanPopup()">Thêm hồ sơ</button>
+        {% endif %}
+        {% endif %}
+
+        {# ===== VĂN THƯ ===== #}
+        {% if request.user.role == "VAN_THU" %}
+        {# Nút Ban hành chỉ hiện khi đang Chờ ban hành #}
+        {% if vb.trang_thai == "Chờ ban hành" and duyet_record and duyet_record.van_thu_id == request.user.core_profile.pk %}
+        <form method="post" action="{% url 'quanlyvanbandi:ban_hanh_van_ban' vb.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success" style="padding:8px 16px;">Ban hành</button>
+        </form>
+        {% endif %}
+        {% if vb.ho_so_van_ban %}
+        <a href="{% url 'hosovanban:chi_tiet' vb.ho_so_van_ban.pk %}" class="btn btn-primary" style="padding:8px 16px; text-decoration:none;">Xem hồ sơ</a>
+        {% else %}
+        <button class="btn btn-primary" style="padding:8px 16px;" onclick="openThemVanBanPopup()">Thêm hồ sơ</button>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+
+    <hr style="border:none; border-top:1px solid #F1F1F1; margin:12px 0 16px;">
+
+    <div class="detail-info-grid">
+      <div class="detail-col">
+        <p><strong>Trích yếu</strong><br>{{ vb.trich_yeu|default:"-" }}</p>
+        <p><strong>Đơn vị soạn thảo</strong><br>
+          {% if vb.nguoi_tao %}
+            {% if vb.nguoi_tao.phong_ban %}{{ vb.nguoi_tao.phong_ban.ten_phong_ban }} - {% endif %}
+            {{ vb.nguoi_tao.ho_va_ten|default:"-" }}
+          {% else %}
+            -
+          {% endif %}
+        </p>
+        <p><strong>Hình thức</strong><br>{{ vb.hinh_thuc|default:"-" }}</p>
+        <p><strong>Độ khẩn</strong><br>{{ vb.do_khan|default:"-" }}</p>
+      </div>
+
+      <div class="detail-col">
+        <p><strong>Số ký hiệu</strong><br>{{ vb.so_ky_hieu|default:"-" }}</p>
+        <p><strong>Loại văn bản</strong><br>{{ vb.loai_van_ban|default:"-" }}</p>
+        <p><strong>Ngày văn bản</strong><br>{{ vb.ngay_van_ban|date:"d/m/Y"|default:"-" }}</p>
+        <p><strong>Hạn xử lý</strong><br>{{ vb.han_xu_ly|date:"d/m/Y"|default:"-" }}</p>
+      </div>
+
+      <div class="detail-col">
+        <p><strong>Lãnh đạo xử lý</strong><br>{{ vb.lanh_dao_duyet|default:"-" }}</p>
+        <p><strong>Trạng thái</strong><br>
+          {% if hien_thi_trang_thai|lower == "chờ xử lý" %}
+            <span class="status-badge-detail badge-cho-xu-ly">{{ hien_thi_trang_thai }}</span>
+          {% elif hien_thi_trang_thai|lower == "đã xử lý" %}
+            <span class="status-badge-detail badge-da-xu-ly">{{ hien_thi_trang_thai }}</span>
+          {% elif hien_thi_trang_thai|lower == "chờ ban hành" %}
+            <span class="status-badge-detail badge-cho-ban-hanh">{{ hien_thi_trang_thai }}</span>
+          {% elif hien_thi_trang_thai|lower == "đã ban hành" %}
+            <span class="status-badge-detail badge-da-ban-hanh">{{ hien_thi_trang_thai }}</span>
+          {% elif hien_thi_trang_thai|lower == "hoàn trả" %}
+            <span class="status-badge-detail badge-hoan-tra">{{ hien_thi_trang_thai }}</span>
+          {% else %}
+            <span class="status-badge-detail badge-cho-xu-ly">{{ hien_thi_trang_thai|default:"-" }}</span>
+          {% endif %}
+        </p>
+
+        {% if duyet_record %}
+        <p><strong>Ngày duyệt</strong><br>
+          <span style="color:#16a34a; font-weight:600;">{{ duyet_record.ngay_duyet|date:"d/m/Y" }}</span>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if can_view_sensitive_notes %}
+    <div class="detail-note-box" style="border-left: 4px solid #0076A2; background: #F5F5F5">
+      <strong style="color:#000080;">Nội dung trình lãnh đạo:</strong>
+      <div style="margin-top:8px;">{{ vb.noi_dung|default:"-" }}</div>
+    </div>
+
+    {% if duyet_record and duyet_record.ghi_chu %}
+    <div class="detail-note-box" style="margin-top:12px; background:#EFF6FF; border-left: 4px solid #0076A2;">
+      <strong style="color:#0f172a;">Ghi chú cho văn thư:</strong>
+      <div style="margin-top:8px;">{{ duyet_record.ghi_chu }}</div>
+    </div>
+    {% endif %}
+
+    {% if hoan_tra %}
+    <div class="detail-note-box" style="margin-top:12px; background:#FEF2F2; border-left: 4px solid #0076A2;">
+      <strong style="color:#9F0736;">Ý kiến xử lý / hoàn trả:</strong>
+      <div style="margin-top:8px; display:flex; gap:24px; flex-wrap:wrap; font-size:13px;">
+        <div>
+          <strong>Ngày hoàn trả:</strong>
+          <span style="color:#dc2626; font-weight:700;">{{ hoan_tra.ngay_hoan_tra|date:"d/m/Y" }}</span>
+        </div>
+        <div>
+          <strong>Hạn xử lý hoàn trả:</strong>
+          <span style="color:#dc2626; font-weight:700;">
+            {{ hoan_tra.han_xu_ly_hoan_tra|date:"d/m/Y"|default:"-" }}
+          </span>
+        </div>
+      </div>
+      <div style="margin-top:8px;">{{ hoan_tra.noi_dung }}</div>
+    </div>
+    {% endif %}
+    {% endif %}
+  </div>
+
+  <div class="card"
+    style="padding: 24px 32px; border: 1px solid var(--border-color); box-shadow: none; margin-bottom: 24px;">
+    <div class="detail-header-title">DANH SÁCH NƠI NHẬN</div>
+    <hr style="border:none; border-top:1px solid #F1F1F1; margin:12px 0 20px;">
+
+    <div style="font-size:14px; font-weight:800; color:#0076A2; margin-bottom:10px;">
+      Danh sách nội bộ
+    </div>
+    <div style="font-size:13px; color:var(--text-main); line-height:1.7;">
+      <ol style="margin:0; padding-left:22px; list-style: decimal;">
+        {% for nn in noi_nhan_noi_bo %}
+          <li style="margin: 4px 0;">
+            {{ nn.phong_ban.chi_nhanh.ten_chi_nhanh|default:"-" }} -
+            {{ nn.phong_ban.ten_phong_ban|default:"-" }} -
+            {{ nn.phong_ban.truong_phong.ho_va_ten|default:"-" }} -
+            {{ nn.phong_ban.truong_phong.sdt|default:"-" }} -
+            {{ nn.phong_ban.truong_phong.email|default:"-" }}
+          </li>
+        {% empty %}
+          <li style="color:var(--text-muted);">-</li>
+        {% endfor %}
+      </ol>
+    </div>
+
+    <hr style="border:none; border-top:1px solid #F1F1F1; margin:18px 0 16px;">
+
+    <div style="font-size:14px; font-weight:800; color:#0076A2; margin-bottom:10px;">
+      Danh sách đơn vị ngoài
+    </div>
+    <div style="font-size:13px; color:var(--text-main); line-height:1.7;">
+      <ol style="margin:0; padding-left:22px; list-style: decimal;">
+        {% for nn in noi_nhan_don_vi_ngoai %}
+          <li style="margin: 4px 0;">
+            {{ nn.don_vi_ngoai.ten_don_vi|default:"-" }} -
+            {{ nn.don_vi_ngoai.so_dien_thoai|default:"-" }} -
+            {{ nn.don_vi_ngoai.email|default:"-" }}{% if nn.don_vi_ngoai.dia_chi %} - {{ nn.don_vi_ngoai.dia_chi }}{% endif %}
+          </li>
+        {% empty %}
+          <li style="color:var(--text-muted);">-</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 24px 32px; border: 1px solid var(--border-color); box-shadow: none;">
+    <div class="detail-header-title">DANH SÁCH VĂN BẢN</div>
+    <hr style="border:none; border-top:1px solid #F1F1F1; margin:12px 0 20px;">
+
+    <div style="font-size:14px; color:var(--text-secondary); margin-bottom:8px;">File đính kèm:</div>
+    <div class="file-list" style="margin-bottom:20px;">
+      {% if vb.file_dinh_kem %}
+      {% with file_name=vb.file_dinh_kem.name|lower %}
+      <a href="#" class="file-item file-preview-trigger" style="text-decoration:none;"
+        data-file-url="{{ vb.file_dinh_kem.url }}" data-file-name="{{ vb.file_dinh_kem.name|cut:'uploads/' }}"
+        data-file-ext="{{ vb.file_dinh_kem.name|lower }}">
+        {% if ".pdf" in file_name %}
+        <span class="file-item-icon file-icon-pdf">PDF</span>
+        {% elif ".docx" in file_name or ".doc" in file_name %}
+        <span class="file-item-icon file-icon-docx">DOCX</span>
+        {% elif ".xlsx" in file_name or ".xls" in file_name %}
+        <span class="file-item-icon file-icon-xlsx">XLSX</span>
+        {% else %}
+        <span class="file-item-icon" style="background:#64748b;">FILE</span>
+        {% endif %}
+        <div>
+          <div class="file-item-name">{{ vb.file_dinh_kem.name|cut:"uploads/" }}</div>
+          <div class="file-item-type">
+            {% if ".pdf" in file_name %}PDF Document
+            {% elif ".docx" in file_name or ".doc" in file_name %}DOCX Document
+            {% elif ".xlsx" in file_name or ".xls" in file_name %}XLSX Document
+            {% else %}Tệp đính kèm{% endif %}
+          </div>
+        </div>
+      </a>
+      {% endwith %}
+      {% else %}
+      <div style="font-size:13px; color:var(--text-muted);">Không có file đính kèm.</div>
+      {% endif %}
+    </div>
+
+    <div style="font-size:14px; color:var(--text-secondary); margin-bottom:8px;">Xem trước</div>
+
+    <div class="preview-shell" id="smart-preview"
+      {% if vb.file_dinh_kem %}data-file-url="{{ vb.file_dinh_kem.url }}" data-file-name="{{ vb.file_dinh_kem.name|cut:'uploads/' }}" data-file-ext="{{ vb.file_dinh_kem.name|lower }}"{% endif %}>
+      <div class="preview-toolbar">
+        <a id="btn-download" href="#" download class="toolbar-btn toolbar-btn-download" style="display:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Tải xuống
+        </a>
+
+        <button type="button" id="btn-print" class="toolbar-btn toolbar-btn-print" style="display:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9" />
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+          In
+        </button>
+
+        <button type="button" id="pdf-prev-btn" class="toolbar-btn" disabled>◀</button>
+        <div class="preview-page-info" id="pdf-page-info">Trang 0 / 0</div>
+        <button type="button" id="pdf-next-btn" class="toolbar-btn" disabled>▶</button>
+
+        {% if vb.file_dinh_kem %}
+        <a href="{{ vb.file_dinh_kem.url }}" target="_blank" class="preview-open-link" id="preview-open-link">Mở tab
+          mới</a>
+        {% endif %}
+      </div>
+
+      <div class="preview-body" id="preview-body">
+        {% if not vb.file_dinh_kem %}
+        <div class="preview-empty">Không có dữ liệu xem trước</div>
+        {% endif %}
+      </div>
+
+      <div id="print-area" style="display:none;"></div>
+    </div>
+
+    <div style="font-size:14px; color:var(--text-secondary); margin-bottom:8px;">Tài liệu liên quan:</div>
+    <div class="file-list">
+      {% if ds_lien_quan %}
+      {% for lq in ds_lien_quan %}
+      {% with file_name=lq.file_van_ban.name|lower %}
+      <a href="#" class="file-item file-preview-trigger" style="text-decoration:none;"
+        data-file-url="{{ lq.file_van_ban.url }}" data-file-name="{{ lq.file_van_ban.name|cut:'uploads/' }}"
+        data-file-ext="{{ lq.file_van_ban.name|lower }}">
+        {% if ".pdf" in file_name %}
+        <span class="file-item-icon file-icon-pdf">PDF</span>
+        {% elif ".docx" in file_name or ".doc" in file_name %}
+        <span class="file-item-icon file-icon-docx">DOCX</span>
+        {% elif ".xlsx" in file_name or ".xls" in file_name %}
+        <span class="file-item-icon file-icon-xlsx">XLSX</span>
+        {% else %}
+        <span class="file-item-icon" style="background:#64748b;">FILE</span>
+        {% endif %}
+        <div>
+          <div class="file-item-name">{{ lq.file_van_ban.name|cut:"uploads/" }}</div>
+          <div class="file-item-type">
+            {% if ".pdf" in file_name %}PDF Document
+            {% elif ".docx" in file_name or ".doc" in file_name %}DOCX Document
+            {% elif ".xlsx" in file_name or ".xls" in file_name %}XLSX Document
+            {% else %}Tài liệu liên quan{% endif %}
+          </div>
+        </div>
+      </a>
+      {% endwith %}
+      {% endfor %}
+      {% else %}
+      <div style="font-size:13px; color:var(--text-muted);">Không có tài liệu liên quan.</div>
+      {% endif %}
+    </div>
+  </div>
+
+
+  {% include "vanbandi/popup-phe-duyet-van-ban-di.html" %}
+
+  {% include "vanbandi/popup-hoan-tra.html" %}
+
+  {% include "vanbandi/_ky_so_modal.html" %}
+
+
+
+  {% csrf_token %}
+  <script id="popup-van-ban-data" type="application/json">{"id": {{ vb.pk }}, "type": "van_ban_di"}</script>
+  <script>
+    var _popupData = JSON.parse(document.getElementById('popup-van-ban-data').textContent);
+    var popupVanBanId = _popupData.id;
+    var popupVanBanType = _popupData.type;
+  </script>
+  {% include "hosovanban/them-van-ban-popup.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'vendor/pdfjs/pdf.min.js' %}"></script>
+<script src="{% static 'vendor/mammoth/mammoth.browser.min.js' %}"></script>
+<script src="{% static 'vendor/sheetjs/xlsx.full.min.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const previewRoot = document.getElementById("smart-preview");
+    const previewBody = document.getElementById("preview-body");
+    const openLink = document.getElementById("preview-open-link");
+    const btnDownload = document.getElementById("btn-download");
+    const btnPrint = document.getElementById("btn-print");
+    const printArea = document.getElementById("print-area");
+
+    const pdfPrevBtn = document.getElementById("pdf-prev-btn");
+    const pdfNextBtn = document.getElementById("pdf-next-btn");
+    const pdfPageInfo = document.getElementById("pdf-page-info");
+
+    let currentFileExt = "";
+    let currentPdfDoc = null;
+    let currentPdfPage = 0;
+    let totalPdfPages = 0;
+
+    function showLoading(text = "Đang tải xem trước...") {
+      previewBody.innerHTML = `<div class="preview-loading">${text}</div>`;
+    }
+
+    function hideToolbarBtns() {
+      if (btnDownload) btnDownload.style.display = "none";
+      if (btnPrint) btnPrint.style.display = "none";
+    }
+
+    function resetPdfNav() {
+      currentPdfPage = 0;
+      totalPdfPages = 0;
+      if (pdfPageInfo) pdfPageInfo.textContent = "Trang 0 / 0";
+      if (pdfPrevBtn) pdfPrevBtn.disabled = true;
+      if (pdfNextBtn) pdfNextBtn.disabled = true;
+    }
+
+    function showError(text = "Không thể xem trước tệp này.") {
+      previewBody.innerHTML = `<div class="preview-error">${text}</div>`;
+      hideToolbarBtns();
+      resetPdfNav();
+    }
+
+    function showToolbarBtns(fileUrl, fileName) {
+      if (btnDownload) {
+        btnDownload.href = fileUrl;
+        btnDownload.setAttribute("download", fileName || "file");
+        btnDownload.style.display = "inline-flex";
+      }
+      if (btnPrint) btnPrint.style.display = "inline-flex";
+      if (openLink) openLink.href = fileUrl;
+    }
+
+    function updatePdfNav() {
+      if (pdfPageInfo) pdfPageInfo.textContent = `Trang ${currentPdfPage} / ${totalPdfPages}`;
+      if (pdfPrevBtn) pdfPrevBtn.disabled = currentPdfPage <= 1 || totalPdfPages === 0;
+      if (pdfNextBtn) pdfNextBtn.disabled = currentPdfPage >= totalPdfPages || totalPdfPages === 0;
+    }
+
+    function enableGenericNav() {
+      if (pdfPrevBtn) pdfPrevBtn.disabled = false;
+      if (pdfNextBtn) pdfNextBtn.disabled = false;
+      if (pdfPageInfo) pdfPageInfo.textContent = "Cuộn tài liệu";
+    }
+
+    function scrollPreviewByStep(direction) {
+      const step = Math.max(300, Math.floor(previewBody.clientHeight * 0.8));
+      previewBody.scrollBy({ top: direction * step, behavior: "smooth" });
+    }
+
+    async function renderPdfPage(pageNumber) {
+      if (!currentPdfDoc || pageNumber < 1 || pageNumber > totalPdfPages) return;
+      currentPdfPage = pageNumber;
+      updatePdfNav();
+      showLoading(`Đang tải trang ${pageNumber}...`);
+      try {
+        const page = await currentPdfDoc.getPage(pageNumber);
+        const containerWidth = Math.max(previewBody.clientWidth - 40, 300);
+        const initialViewport = page.getViewport({ scale: 1 });
+        const scale = Math.min(2, Math.max(1, containerWidth / initialViewport.width));
+        const viewport = page.getViewport({ scale });
+        const canvas = document.createElement("canvas");
+        canvas.className = "pdf-canvas";
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        previewBody.innerHTML = "";
+        previewBody.appendChild(canvas);
+        await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+      } catch (error) {
+        console.error("PDF render error:", error);
+        showError("Không thể hiển thị trang PDF này.");
+      }
+    }
+
+    async function loadPdf(fileUrl, fileName) {
+      try {
+        showLoading("Đang tải PDF...");
+        if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            "{% static 'vendor/pdfjs/pdf.worker.min.js' %}";
+        }
+        const response = await fetch(encodeURI(fileUrl), { method: "GET", credentials: "same-origin" });
+        if (!response.ok) throw new Error(`Fetch PDF failed: ${response.status}`);
+        const contentType = (response.headers.get("content-type") || "").toLowerCase();
+        if (contentType && !contentType.includes("pdf") && !contentType.includes("octet-stream")) {
+          throw new Error(`Invalid content-type: ${contentType}`);
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        currentPdfDoc = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        totalPdfPages = currentPdfDoc.numPages;
+        currentPdfPage = 1;
+        showToolbarBtns(fileUrl, fileName);
+        await renderPdfPage(1);
+      } catch (error) {
+        console.error("PDF load error:", error);
+        currentPdfDoc = null;
+        showError("Không đọc được file PDF.");
+      }
+    }
+
+    async function renderDocx(fileUrl, fileName) {
+      try {
+        showLoading("Đang tải DOCX...");
+        const response = await fetch(fileUrl, { credentials: "same-origin" });
+        if (!response.ok) throw new Error(`Fetch DOCX failed: ${response.status}`);
+        const arrayBuffer = await response.arrayBuffer();
+        const result = await window.mammoth.convertToHtml({ arrayBuffer });
+        previewBody.innerHTML = `<div class="docx-stage">${result.value || "<p>Không có nội dung để hiển thị.</p>"}</div>`;
+        showToolbarBtns(fileUrl, fileName);
+        enableGenericNav();
+      } catch (error) {
+        console.error("DOCX preview error:", error);
+        showError("Không đọc được file Word.");
+      }
+    }
+
+    function renderSheet(workbook, sheetName) {
+      const html = window.XLSX.utils.sheet_to_html(workbook.Sheets[sheetName]);
+      const tabs = workbook.SheetNames.map(name =>
+        `<button type="button" class="xlsx-tab ${name === sheetName ? "active" : ""}" data-sheet="${name}">${name}</button>`
+      ).join("");
+      previewBody.innerHTML = `<div class="xlsx-wrap"><div class="xlsx-sheet-tabs">${tabs}</div><div class="xlsx-table-wrap">${html}</div></div>`;
+      previewBody.querySelectorAll(".xlsx-tab").forEach(btn => {
+        btn.addEventListener("click", function () { renderSheet(workbook, this.dataset.sheet); });
+      });
+    }
+
+    async function renderXlsx(fileUrl, fileName) {
+      try {
+        showLoading("Đang tải Excel...");
+        const response = await fetch(fileUrl, { credentials: "same-origin" });
+        if (!response.ok) throw new Error(`Fetch XLSX failed: ${response.status}`);
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = window.XLSX.read(arrayBuffer, { type: "array" });
+        if (!workbook.SheetNames || !workbook.SheetNames.length) throw new Error("Empty workbook");
+        renderSheet(workbook, workbook.SheetNames[0]);
+        showToolbarBtns(fileUrl, fileName);
+        enableGenericNav();
+      } catch (error) {
+        console.error("XLSX preview error:", error);
+        showError("Không đọc được file Excel.");
+      }
+    }
+
+    function loadPreview(fileUrl, fileName, fileExtRaw) {
+      currentFileExt = (fileExtRaw || "").toLowerCase();
+      currentPdfDoc = null;
+      resetPdfNav();
+      hideToolbarBtns();
+      if (currentFileExt.endsWith(".pdf")) { loadPdf(fileUrl, fileName); return; }
+      if (currentFileExt.endsWith(".docx") || currentFileExt.endsWith(".doc")) { renderDocx(fileUrl, fileName); return; }
+      if (currentFileExt.endsWith(".xlsx") || currentFileExt.endsWith(".xls")) { renderXlsx(fileUrl, fileName); return; }
+      showError("Định dạng này chưa hỗ trợ xem trước.");
+    }
+
+    if (btnPrint) {
+      btnPrint.addEventListener("click", function () {
+        const lower = currentFileExt || "";
+        printArea.innerHTML = "";
+        if (lower.endsWith(".pdf")) {
+          const canvas = previewBody.querySelector(".pdf-canvas");
+          if (canvas) { const img = document.createElement("img"); img.src = canvas.toDataURL("image/png"); printArea.appendChild(img); }
+        } else if (lower.endsWith(".docx") || lower.endsWith(".doc")) {
+          const docxEl = previewBody.querySelector(".docx-stage");
+          if (docxEl) printArea.innerHTML = docxEl.outerHTML;
+        } else if (lower.endsWith(".xlsx") || lower.endsWith(".xls")) {
+          const tableWrap = previewBody.querySelector(".xlsx-wrap");
+          if (tableWrap) printArea.innerHTML = tableWrap.outerHTML;
+        }
+        printArea.style.display = "block";
+        window.print();
+        printArea.style.display = "none";
+      });
+    }
+
+    if (pdfPrevBtn) {
+      pdfPrevBtn.addEventListener("click", function () {
+        if (currentFileExt.endsWith(".pdf")) renderPdfPage(currentPdfPage - 1);
+        else scrollPreviewByStep(-1);
+      });
+    }
+
+    if (pdfNextBtn) {
+      pdfNextBtn.addEventListener("click", function () {
+        if (currentFileExt.endsWith(".pdf")) renderPdfPage(currentPdfPage + 1);
+        else scrollPreviewByStep(1);
+      });
+    }
+
+    document.querySelectorAll(".file-preview-trigger").forEach(trigger => {
+      trigger.addEventListener("click", function (e) {
+        e.preventDefault();
+        document.querySelectorAll(".file-preview-trigger").forEach(el => el.classList.remove("active"));
+        this.classList.add("active");
+        if (previewRoot) previewRoot.scrollIntoView({ behavior: "smooth", block: "start" });
+        loadPreview(this.dataset.fileUrl, this.dataset.fileName, this.dataset.fileExt);
+      });
+    });
+
+    const firstTrigger = document.querySelector(".file-preview-trigger");
+    if (firstTrigger) {
+      firstTrigger.classList.add("active");
+      loadPreview(firstTrigger.dataset.fileUrl, firstTrigger.dataset.fileName || "", firstTrigger.dataset.fileExt || "");
+    } else {
+      resetPdfNav();
+    }
+  });
+</script>
+<script>
+  (function() {
+    var modal = document.getElementById("approvalModal");
+    var openBtn = document.getElementById("openApprovalModal");
+    var closeBtn = document.getElementById("closeApprovalModal");
+
+    if (modal && openBtn) {
+      openBtn.addEventListener("click", function() {
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+      });
+    }
+
+    if (modal && closeBtn) {
+      closeBtn.addEventListener("click", function() {
+        modal.style.display = "none";
+        document.body.style.overflow = "";
+      });
+    }
+
+    if (modal) {
+      modal.addEventListener("click", function(e) {
+        if (e.target === modal) {
+          modal.style.display = "none";
+          document.body.style.overflow = "";
+        }
+      });
+    }
+  })();
+</script>
+{% endblock %}
