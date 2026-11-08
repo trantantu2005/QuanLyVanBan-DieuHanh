@@ -78,7 +78,28 @@ Mở: http://127.0.0.1:8000/
 
 ## 6. Đóng góp của tôi
 
-> *Điền những phần thực hiện cá nhân: phân tích nghiệp vụ, lập trình Django, thiết kế dữ liệu, phân quyền, kiểm thử, v.v.*
+## 6. Vai trò và đóng góp cá nhân
+
+**Hình thức:** Đồ án nhóm môn Lập trình Web  
+**Vai trò:** Thành viên phát triển hệ thống – phụ trách module Quản lý văn bản đến và Trang chủ (Dashboard).
+
+### Công việc thực hiện
+
+**1. Module Quản lý văn bản đến**
+- Tham gia xây dựng chức năng quản lý văn bản đến trong hệ thống.
+- Phát triển các chức năng tiếp nhận, hiển thị danh sách, xem chi tiết và cập nhật thông tin văn bản đến.
+- Xử lý và hoàn thiện giao diện phục vụ quá trình theo dõi, quản lý văn bản.
+
+**2. Trang chủ (Dashboard)**
+- Tham gia thiết kế và xây dựng giao diện trang chủ của hệ thống.
+- Tổ chức bố cục, hiển thị các thông tin tổng quan và hỗ trợ người dùng truy cập các chức năng chính.
+- Điều chỉnh giao diện nhằm nâng cao tính trực quan và thuận tiện khi sử dụng.
+
+### Kỹ năng và kinh nghiệm tích lũy
+- Phát triển ứng dụng web sử dụng Python, Django và Django Templates.
+- Làm việc với giao diện HTML, CSS và dữ liệu trong ứng dụng web.
+- Tìm hiểu quy trình xử lý văn bản và tổ chức chức năng trong hệ thống thông tin quản lý.
+- Phối hợp phát triển phần mềm theo nhóm và tích hợp các module vào hệ thống chung.
 
 ## 7. Ghi chú bảo mật
 
