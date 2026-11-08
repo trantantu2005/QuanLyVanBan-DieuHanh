@@ -76,7 +76,6 @@ Mở: http://127.0.0.1:8000/
 - Chỉ công bố những kết quả kiểm thử bạn trực tiếp chạy và lưu được log.
 - Dự án gốc có thư mục media và tài liệu đầu vào: **các tệp đó đã bị loại khỏi bộ mã nguồn này** để tránh đưa nội dung người dùng lên GitHub.
 
-## 6. Đóng góp của tôi
 
 ## 6. Vai trò và đóng góp cá nhân
 
